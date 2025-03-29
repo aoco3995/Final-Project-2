@@ -1,0 +1,26 @@
+<annotation>
+	<folder>airskin</folder>
+	<filename>262.jpg</filename>
+	<path>F:\data\AIRSKIN_DET2023\airskin\262.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1120</width>
+		<height>960</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>rivet_damage</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>2</xmin>
+			<ymin>90</ymin>
+			<xmax>75</xmax>
+			<ymax>256</ymax>
+		</bndbox>
+	</object>
+</annotation>
