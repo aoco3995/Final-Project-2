@@ -1,0 +1,4 @@
+scratch
+paint_peel
+rust
+rivet_damage
