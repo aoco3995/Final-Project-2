@@ -1,0 +1,1 @@
+[{"image": "224.jpg", "annotations": [{"label": "paint_peel", "coordinates": {"x": 406.28313253012055, "y": 594.5722891566265, "width": 81.0, "height": 79.0}}, {"label": "paint_peel", "coordinates": {"x": 830.2831325301206, "y": 644.5722891566265, "width": 61.0, "height": 61.0}}]}]

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>airskin</folder>
+	<filename>380.jpg</filename>
+	<path>F:\data\AIRSKIN_DET2023\airskin\380.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1120</width>
+		<height>960</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>paint_peel</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>584</xmin>
+			<ymin>401</ymin>
+			<xmax>678</xmax>
+			<ymax>490</ymax>
+		</bndbox>
+	</object>
+</annotation>
