@@ -1,0 +1,26 @@
+<annotation>
+	<folder>airskin</folder>
+	<filename>398.jpg</filename>
+	<path>F:\data\AIRSKIN_DET2023\airskin\398.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1120</width>
+		<height>960</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>rust</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>96</xmin>
+			<ymin>733</ymin>
+			<xmax>333</xmax>
+			<ymax>947</ymax>
+		</bndbox>
+	</object>
+</annotation>

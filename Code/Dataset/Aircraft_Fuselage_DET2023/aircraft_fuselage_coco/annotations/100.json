@@ -1,0 +1,1 @@
+[{"image": "100.jpg", "annotations": [{"label": "rust", "coordinates": {"x": 849.7831325301206, "y": 847.0722891566265, "width": 54.0, "height": 68.0}}, {"label": "rust", "coordinates": {"x": 1049.2831325301206, "y": 807.0722891566265, "width": 71.0, "height": 86.0}}]}]

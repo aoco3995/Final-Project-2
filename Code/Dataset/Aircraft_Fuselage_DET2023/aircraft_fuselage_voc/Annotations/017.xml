@@ -1,0 +1,26 @@
+<annotation>
+	<folder>airskin</folder>
+	<filename>017.jpg</filename>
+	<path>F:\data\AIRSKIN_DET2023\airskin\017.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1120</width>
+		<height>960</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>scratch</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>11</xmin>
+			<ymin>44</ymin>
+			<xmax>88</xmax>
+			<ymax>128</ymax>
+		</bndbox>
+	</object>
+</annotation>
