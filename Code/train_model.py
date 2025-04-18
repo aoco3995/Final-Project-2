@@ -14,15 +14,6 @@ from tqdm import tqdm
 from model import CNN  # Import the CNN model from model.py
 from config import *
 
-# Set device
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-
-# Get base path relative to current file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Corrected Path to JSON annotations and images
-JSON_FOLDER = os.path.join(BASE_DIR, "Dataset", "Aircraft_Fuselage_DET2023", "aircraft_fuselage_coco", "annotations")
-DATA_DIR = os.path.join(BASE_DIR, "Dataset", "Aircraft_Fuselage_DET2023", "aircraft_fuselage_coco", "images")
 
 # Load JSON annotations
 def load_json_annotations(json_folder):
