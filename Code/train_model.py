@@ -11,15 +11,8 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import f1_score, accuracy_score, hamming_loss, cohen_kappa_score, matthews_corrcoef
 from torchvision import transforms
 from tqdm import tqdm
-
-# Configuration
-IMAGE_SIZE = 100
-BATCH_SIZE = 30
-LR = 0.001
-n_epoch = 2
-THRESHOLD = 0.5
-SAVE_MODEL = True
-NICKNAME = "Valetudo"
+from model import CNN  # Import the CNN model from model.py
+from config import *
 
 # Set device
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -44,23 +37,6 @@ def load_json_annotations(json_folder):
                         label = ann["label"]
                         rows.append({"id": image, "target": label})
     return pd.DataFrame(rows)
-
-# CNN Model
-class CNN(nn.Module):
-    def __init__(self, num_classes):
-        super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
-        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(32 * (IMAGE_SIZE // 4) * (IMAGE_SIZE // 4), 128)
-        self.fc2 = nn.Linear(128, num_classes)
-
-    def forward(self, x):
-        x = self.pool(torch.relu(self.conv1(x)))
-        x = self.pool(torch.relu(self.conv2(x)))
-        x = x.view(-1, 32 * (IMAGE_SIZE // 4) * (IMAGE_SIZE // 4))
-        x = torch.relu(self.fc1(x))
-        return self.fc2(x)
 
 # Dataset Class
 class CustomDataset(data.Dataset):
