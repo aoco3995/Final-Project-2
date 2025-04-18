@@ -8,11 +8,11 @@ import torch
 import torch.nn as nn
 from torch.utils import data
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import f1_score, accuracy_score, hamming_loss, cohen_kappa_score, matthews_corrcoef
 from torchvision import transforms
 from tqdm import tqdm
 from model import CNN  # Import the CNN model from model.py
 from config import *
+from metrics import evaluate_metrics  # Import the metrics from metrics.py
 
 
 # Load JSON annotations
@@ -55,16 +55,6 @@ class CustomDataset(data.Dataset):
                 target[self.label_map[label]] = 1
         return image, torch.FloatTensor(target)
 
-# Metrics
-
-def evaluate_metrics(y_true, y_pred):
-    return {
-        'f1_macro': f1_score(y_true, y_pred, average='macro'),
-        'accuracy': accuracy_score(y_true, y_pred),
-        'hamming': hamming_loss(y_true, y_pred),
-        'cohen': cohen_kappa_score(y_true.argmax(axis=1), y_pred.argmax(axis=1)),
-        'mcc': matthews_corrcoef(y_true.argmax(axis=1), y_pred.argmax(axis=1))
-    }
 
 # Main training loop
 def train_model():
