@@ -16,10 +16,10 @@ from tqdm import tqdm
 IMAGE_SIZE = 100
 BATCH_SIZE = 30
 LR = 0.001
-n_epoch = 2
+n_epoch = 20
 THRESHOLD = 0.5
 SAVE_MODEL = True
-NICKNAME = "Valetudo"
+NICKNAME = "MARS"
 
 # Set device
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
