@@ -6,16 +6,24 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from model import CNN  # Import the CNN model from model.py
 from config import *
 from metrics import evaluate_metrics  # Import the metrics from metrics.py
-from data_loader import load_json_annotations, CustomDataset  # Import the data loader functions
+from dataset_loader import load_json_annotations, CustomDataset  # Import the data loader functions
 
 
 # Main training loop
 def train_model():
+
+    # Load JSON annotations and prepare the dataset
     df = load_json_annotations(JSON_FOLDER)
+
+    # Group by 'id' and join targets, then create train/test split
     df = df.groupby('id')['target'].apply(lambda x: ','.join(sorted(set(x)))).reset_index()
+
+    # Create a split for training and testing
     df['split'] = ['train' if i % 5 != 0 else 'test' for i in range(len(df))]
 
     mlb = MultiLabelBinarizer()
+
+    # Convert targets to a binary matrix
     class_names = sorted(set(','.join(df['target']).split(',')))
     label_map = {label: idx for idx, label in enumerate(class_names)}
 
