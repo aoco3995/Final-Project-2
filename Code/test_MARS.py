@@ -6,16 +6,27 @@ import pandas as pd
 from torchvision import transforms
 from tqdm import tqdm
 from sklearn.preprocessing import MultiLabelBinarizer
+import numpy as np
+from torch.utils import data
 
 IMAGE_SIZE = 100
 NUM_CLASSES = 4
 NICKNAME = "MARS"
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-UNLABELED_IMAGES = [...]  # list of 5000 image file names
-LABEL_MAP = {...}  # Your label -> index dictionary
+LABEL_MAP = {
+    "Crack": 0,
+    "Dent": 1,
+    "Paint_Peel": 2,
+    "Scratch": 3
+}  # Your label -> index dictionary
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "Dataset", "Aircraft_Fuselage_DET2023", "unlabel_aircraft_fuselage")
+
+UNLABELED_IMAGES = sorted([
+    f for f in os.listdir(DATA_DIR)
+    if f.lower().endswith(('.jpg', '.jpeg', '.png'))
+])
 
 n_epoch = 1
 BATCH_SIZE = 30
@@ -29,7 +40,7 @@ SAVE_MODEL = True
 #---- Define the model ---- #
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes):
         super(CNN, self).__init__()
 
         self.conv1 = nn.Conv2d(3, 16, (3, 3))
@@ -39,7 +50,7 @@ class CNN(nn.Module):
         self.conv2 = nn.Conv2d(16, 128, (3, 3))
         self.global_avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
-        self.linear = nn.Linear(128, NUM_CLASSES)
+        self.linear = nn.Linear(128, num_classes)
         self.act = torch.relu
 
     def forward(self, x):
@@ -47,25 +58,39 @@ class CNN(nn.Module):
         x = self.act(self.conv2(self.act(x)))
         return self.linear(self.global_avg_pool(x).view(-1, 128))
 
-
-#------------------------------------------------------------------------------------------------------------------
-
-class ModelTester:
-    def __init__(self, model, model_path, label_map, image_dir, image_size=100, threshold=0.5, device=None):
-        self.model = model
-        self.model_path = model_path
-        self.label_map = label_map
-        self.rev_label_map = {v: k for k, v in label_map.items()}
-        self.image_dir = image_dir
-        self.image_size = image_size
-        self.threshold = threshold
-        self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
+# Dataset Class
+class UnlabeledDataset(data.Dataset):
+    def __init__(self, image_list, DATA_DIR, image_size=100):
+        self.image_list = image_list
+        self.DATA_DIR = DATA_DIR
         self.transform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize((image_size, image_size)),
             transforms.ToTensor()
         ])
 
+    def __len__(self):
+        return len(self.image_list)
+
+    def __getitem__(self, idx):
+        img_name = self.image_list[idx]
+        img_path = os.path.join(self.DATA_DIR, img_name)
+        image = cv2.imread(img_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = self.transform(image)
+        return image, img_name
+
+
+class ModelTester:
+    def __init__(self, model, model_path, label_map, threshold=0.5, image_size=100, batch_size=32, device=None):
+        self.model = model
+        self.model_path = model_path
+        self.label_map = label_map
+        self.rev_label_map = {v: k for k, v in label_map.items()}
+        self.threshold = threshold
+        self.image_size = image_size
+        self.batch_size = batch_size
+        self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self._load_model()
 
     def _load_model(self):
@@ -73,27 +98,20 @@ class ModelTester:
         self.model.to(self.device)
         self.model.eval()
 
-    def predict_image(self, img_path):
-        img = cv2.imread(os.path.join(self.image_dir, img_path))
-        if img is None:
-            return []
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_tensor = self.transform(img).unsqueeze(0).to(self.device)
+    def run(self, image_list, image_dir, save_csv=None):
+        dataset = UnlabeledDataset(image_list, image_dir, image_size=self.image_size)
+        dataloader = data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
+
+        results = []
 
         with torch.no_grad():
-            output = torch.sigmoid(self.model(img_tensor)).cpu().numpy()[0]
+            for images, img_names in tqdm(dataloader, desc="Running Inference"):
+                images = images.to(self.device)
+                outputs = torch.sigmoid(self.model(images)).cpu().numpy()
 
-        predicted_labels = [
-            self.rev_label_map[i] for i, prob in enumerate(output) if prob > self.threshold
-        ]
-        return predicted_labels
-
-    def run_on_images(self, image_list, save_csv=None, confidence_threshold=0.9):
-        results = []
-        for img_name in tqdm(image_list, desc="Generating pseudo-labels"):
-            preds = self.predict_image(img_name)
-            if preds:
-                results.append({"id": img_name, "target": ",".join(preds)})
+                for i, output in enumerate(outputs):
+                    preds = [self.rev_label_map[j] for j, prob in enumerate(output) if prob > self.threshold]
+                    results.append({"id": img_names[i], "target": ",".join(preds)})
 
         df_results = pd.DataFrame(results)
         if save_csv:
@@ -103,8 +121,19 @@ class ModelTester:
     # ------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    model = CNN()
-    MODEL_PATH = model.load_state_dict(torch.load('model_{}.pt'.format(NICKNAME), map_location=device))
-    tester = ModelTester(model, MODEL_PATH, LABEL_MAP, DATA_DIR, image_size=IMAGE_SIZE)
+    model = CNN(num_classes=NUM_CLASSES)
+    tester = ModelTester(model=model,
+                         model_path='model_{}.pt'.format(NICKNAME),
+                         label_map=LABEL_MAP,
+                         threshold=THRESHOLD,
+                         image_size=IMAGE_SIZE,
+                         batch_size=BATCH_SIZE,
+                         device=device)
 
-    pseudo_labels_df = tester.run_on_images(UNLABELED_IMAGES, save_csv="pseudo_labels.csv")
+    df_pseudo_labels = tester.run(
+        image_list=UNLABELED_IMAGES,
+        image_dir=DATA_DIR,
+        save_csv='pseudo_labels_{}.csv'.format(NICKNAME)
+    )
+
+    print("✅ Saved pseudo-labels for {} images".format(len(df_pseudo_labels)))
