@@ -42,21 +42,18 @@ SAVE_MODEL = True
 class CNN(nn.Module):
     def __init__(self, num_classes):
         super(CNN, self).__init__()
-
-        self.conv1 = nn.Conv2d(3, 16, (3, 3))
-        self.convnorm1 = nn.BatchNorm2d(16)
-        self.pad1 = nn.ZeroPad2d(2)
-
-        self.conv2 = nn.Conv2d(16, 128, (3, 3))
-        self.global_avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-
-        self.linear = nn.Linear(128, num_classes)
-        self.act = torch.relu
+        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(32 * (IMAGE_SIZE // 4) * (IMAGE_SIZE // 4), 128)
+        self.fc2 = nn.Linear(128, num_classes)
 
     def forward(self, x):
-        x = self.pad1(self.convnorm1(self.act(self.conv1(x))))
-        x = self.act(self.conv2(self.act(x)))
-        return self.linear(self.global_avg_pool(x).view(-1, 128))
+        x = self.pool(torch.relu(self.conv1(x)))
+        x = self.pool(torch.relu(self.conv2(x)))
+        x = x.view(-1, 32 * (IMAGE_SIZE // 4) * (IMAGE_SIZE // 4))
+        x = torch.relu(self.fc1(x))
+        return self.fc2(x)
 
 # Dataset Class
 class UnlabeledDataset(data.Dataset):
