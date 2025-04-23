@@ -11,15 +11,16 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import f1_score, accuracy_score, hamming_loss, cohen_kappa_score, matthews_corrcoef
 from torchvision import transforms
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 # Configuration
 IMAGE_SIZE = 100
 BATCH_SIZE = 30
 LR = 0.001
-n_epoch = 2
+n_epoch = 20
 THRESHOLD = 0.5
 SAVE_MODEL = True
-NICKNAME = "Valetudo"
+NICKNAME = "MARS"
 
 # Set device
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -124,10 +125,12 @@ def train_model():
 
     best_f1 = 0
 
+    total_loss = []
+    ind = []
     for epoch in range(n_epoch):
         model.train()
         running_loss = 0
-        for inputs, targets in train_loader:
+        for batch_idx, (inputs, targets) in enumerate(train_loader):
             inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -135,6 +138,12 @@ def train_model():
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
+            if batch_idx % 100 == 0:
+                total_loss.append(loss.item())
+                ind.append(batch_idx + epoch * len(train_loader) / BATCH_SIZE)
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(inputs), len(train_loader.dataset),
+                           100. * batch_idx / len(train_loader), loss.item()))
 
         model.eval()
         preds, reals = [], []
@@ -153,6 +162,11 @@ def train_model():
             best_f1 = metrics['f1_macro']
             torch.save(model.state_dict(), f"model_{NICKNAME}.pt")
             print("Model saved!")
+
+    plt.plot(total_loss)
+    plt.title('Training Loss')
+    plt.xlabel('Iterations')
+    plt.show()
 
 if __name__ == '__main__':
     train_model()
