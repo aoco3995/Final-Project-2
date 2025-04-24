@@ -8,7 +8,7 @@ LR = 0.0005
 n_epoch = 2
 THRESHOLD = 0.5
 SAVE_MODEL = True
-NICKNAME = "Valetudo"
+NICKNAME = "MARS"
 
 # Set device
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
