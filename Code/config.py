@@ -2,10 +2,10 @@ import torch
 import os
 
 # Configuration
-IMAGE_SIZE = 100
+IMAGE_SIZE = 500
 BATCH_SIZE = 30
-LR = 0.0005
-n_epoch = 2
+LR = 0.0001
+n_epoch = 200
 THRESHOLD = 0.5
 SAVE_MODEL = True
 NICKNAME = "MARS"
