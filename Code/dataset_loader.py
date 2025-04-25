@@ -12,42 +12,6 @@ import torch
 import math
 import random
 
-class RandomZoomCropWithMetadata:
-    def __init__(self, scale_range=(0.5, 1.0), image_size=224):
-        self.scale_range = scale_range  # e.g., 0.5 to 1.0 means zoom from 50% to full image
-        self.image_size = image_size
-
-    def __call__(self, img: Image.Image):
-        width, height = img.size
-
-        # Random scale
-        scale = random.uniform(*self.scale_range)
-        crop_width = int(width * scale)
-        crop_height = int(height * scale)
-
-        # Random top-left coordinate (ensure it stays within bounds)
-        max_left = width - crop_width
-        max_top = height - crop_height
-        left = random.randint(0, max_left) if max_left > 0 else 0
-        top = random.randint(0, max_top) if max_top > 0 else 0
-        right = left + crop_width
-        bottom = top + crop_height
-
-        # Crop and resize
-        cropped_img = img.crop((left, top, right, bottom))
-        resized_img = cropped_img.resize((self.image_size, self.image_size))
-
-        # Metadata
-        metadata = {
-            "scale": scale,
-            "crop_box": (left, top, right, bottom),
-            "original_size": (width, height)
-        }
-
-        return resized_img, metadata
-
-
-
 # Load JSON annotations
 def load_json_annotations(json_folder):
     rows = []
