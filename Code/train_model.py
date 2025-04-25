@@ -12,15 +12,32 @@ from config import *
 from dataset_loader import CustomDataset, load_json_annotations
 from model import CNN
 from metrics import evaluate_metrics
-
-
-
+import shutil
+import inspect
 
 # Main training loop
 def train_model():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_dir = os.path.join(BASE_DIR, "training_logs", f"{NICKNAME}_{timestamp}")
     os.makedirs(log_dir, exist_ok=True)
+    script_dir = os.path.join(log_dir, "scripts")
+    os.makedirs(script_dir, exist_ok=True)
+
+    source_files = [
+        inspect.getfile(inspect.currentframe()),  # this script
+        os.path.join(BASE_DIR, "config.py"),
+        os.path.join(BASE_DIR, "dataset_loader.py"),
+        os.path.join(BASE_DIR, "metrics.py"),
+        os.path.join(BASE_DIR, "model.py")
+    ]
+
+    for src_path in source_files:
+        if os.path.exists(src_path):
+            dst_path = os.path.join(script_dir, os.path.basename(src_path).replace(".py", "_script.txt"))
+            shutil.copy2(src_path, dst_path)
+            print(f"Copied {src_path} to {dst_path}")
+        else:
+            print(f"Warning: {src_path} not found and was not copied.")
 
     # Save hyperparameters
     hyperparams = {
@@ -37,7 +54,6 @@ def train_model():
             f.write(f"{key}: {val}\n")
 
     df = load_json_annotations(JSON_FOLDER)
-
 
     df = (
         df
@@ -77,7 +93,6 @@ def train_model():
     plt.imshow(train_set[0][0][0], cmap='gray')
     plt.savefig(os.path.join(log_dir, "first_feature.png"))
     plt.close()
-
 
     train_loader = data.DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = data.DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False)
