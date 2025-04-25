@@ -81,16 +81,16 @@ class CustomDataset(data.Dataset):
         img_path = os.path.join(DATA_DIR, row['id'])
         image = cv2.imread(img_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        change = random.randint(1,2)
+        change = random.randint(1,5)
         for ann in row['data']['annotations']:
             if (change == 1):
-                x = random.randint(0, image.shape[1])
-                y = random.randint(0, image.shape[0])
-                row_target = row['target']
-            else:
                 x = int(math.floor(ann['coordinates']['x']))
                 y = int(math.floor(ann['coordinates']['y']))
                 row_target = 'none'
+            else:
+                x = random.randint(0, image.shape[1])
+                y = random.randint(0, image.shape[0])
+                row_target = row['target']
                 
 
             w = int(ann['coordinates']['width'])
