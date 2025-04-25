@@ -1,3 +1,4 @@
+import importlib
 import os
 import numpy as np
 import torch
@@ -36,11 +37,25 @@ def train_model():
             f.write(f"{key}: {val}\n")
 
     df = load_json_annotations(JSON_FOLDER)
-    df = df.groupby('id')['target'].apply(lambda x: ','.join(sorted(set(x)))).reset_index()
+
+
+    df = (
+        df
+        .groupby("id")
+        .agg({
+            "target": lambda x: ",".join(sorted(set(x))),
+            "data":   "first"
+        })
+        .reset_index()
+    )
+
+    #df = df.groupby('id')['target'].apply(lambda x: ','.join(sorted(set(x)))).reset_index()
+
     df['split'] = ['train' if i % 5 != 0 else 'test' for i in range(len(df))]
 
     mlb = MultiLabelBinarizer()
     class_names = sorted(set(','.join(df['target']).split(',')))
+    class_names += ['none']
     label_map = {label: idx for idx, label in enumerate(class_names)}
 
     train_df = df[df['split'] == 'train'].reset_index(drop=True)
