@@ -14,6 +14,7 @@ from model import CNN
 from metrics import evaluate_metrics
 import shutil
 import inspect
+import json
 
 # Main training loop
 def train_model():
@@ -116,7 +117,7 @@ def train_model():
     criterion = nn.BCEWithLogitsLoss()
 
     best_f1 = 0
-
+    metrics_log = []  # Store metrics for each epoch
     total_loss = []
     ind = []
     for epoch in range(n_epoch):
@@ -148,12 +149,30 @@ def train_model():
                 reals.extend(targets.numpy())
 
         metrics = evaluate_metrics(np.array(reals), np.array(preds))
-        print(f"Epoch {epoch+1}: Loss={running_loss:.4f}, F1={metrics['f1_macro']:.4f}, Accuracy={metrics['accuracy']:.4f}")
+        epoch_metrics = {
+            "epoch": epoch + 1,
+            "loss": running_loss,
+            "f1_macro": metrics["f1_macro"],
+            "accuracy": metrics["accuracy"],
+            "f1_micro": metrics.get("f1_micro"),
+            "f1_weighted": metrics.get("f1_weighted"),
+            "hamming_loss": metrics.get("hamming"),
+            "cohen_kappa": metrics.get("cohen"),
+            "matthews_corrcoef": metrics.get("mcc")
+        }
+        metrics_log.append(epoch_metrics)
+
+        print(
+            f"Epoch {epoch + 1}: Loss={running_loss:.4f}, F1={metrics['f1_macro']:.4f}, Accuracy={metrics['accuracy']:.4f}")
 
         if metrics['f1_macro'] > best_f1 and SAVE_MODEL:
             best_f1 = metrics['f1_macro']
             torch.save(model.state_dict(), f"model_{NICKNAME}.pt")
             print("Model saved!")
+
+    with open(os.path.join(log_dir, "metrics_log.json"), "w") as f:
+        json.dump(metrics_log, f, indent=4)
+    print(f"Saved metrics log to {os.path.join(log_dir, 'metrics_log.json')}")
 
     plt.figure()
     plt.plot(total_loss)
