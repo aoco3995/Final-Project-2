@@ -5,7 +5,8 @@ import torch
 import torch.nn as nn
 from torch.utils import data
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import f1_score, accuracy_score, hamming_loss, cohen_kappa_score, matthews_corrcoef
+from sklearn.metrics import f1_score, accuracy_score, hamming_loss, cohen_kappa_score, matthews_corrcoef, \
+    multilabel_confusion_matrix, classification_report
 import matplotlib.pyplot as plt
 from datetime import datetime
 from config import *
@@ -15,6 +16,7 @@ from metrics import evaluate_metrics
 import shutil
 import inspect
 import json
+import seaborn as sns
 
 # Main training loop
 def train_model():
@@ -161,6 +163,34 @@ def train_model():
             "matthews_corrcoef": metrics.get("mcc")
         }
         metrics_log.append(epoch_metrics)
+
+        # Calculate multilabel confusion matrices
+        conf_matrices = multilabel_confusion_matrix(np.array(reals), np.array(preds))
+
+        # Create a directory to save confusion matrices if not exists
+        conf_dir = os.path.join(log_dir, "confusion_matrices")
+        os.makedirs(conf_dir, exist_ok=True)
+
+        # Save each class confusion matrix separately
+        for class_idx, cm in enumerate(conf_matrices):
+            plt.figure(figsize=(4, 4))
+            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+                        xticklabels=[f'Not {class_idx}', f'{class_idx}'],
+                        yticklabels=[f'Not {class_idx}', f'{class_idx}'])
+            plt.title(f'Confusion Matrix for Class {class_idx}')
+            plt.xlabel('Predicted')
+            plt.ylabel('True')
+            plt.tight_layout()
+            plt.savefig(os.path.join(conf_dir, f"confusion_matrix_class_{class_idx}_epoch_{epoch + 1}.png"))
+            plt.close()
+
+        # Generate classification report
+        report = classification_report(np.array(reals), np.array(preds), target_names=list(label_map.keys()),
+                                       zero_division=0)
+
+        # Save classification report to a text file
+        with open(os.path.join(log_dir, "classification_report.txt"), "w") as f:
+            f.write(report)
 
         print(
             f"Epoch {epoch + 1}: Loss={running_loss:.4f}, F1={metrics['f1_macro']:.4f}, Accuracy={metrics['accuracy']:.4f}")
