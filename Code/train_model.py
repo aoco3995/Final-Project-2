@@ -26,6 +26,15 @@ def train_model():
     script_dir = os.path.join(log_dir, "scripts")
     os.makedirs(script_dir, exist_ok=True)
 
+    # Save model
+    model_path = os.path.join(log_dir, f"model_{NICKNAME}.pt")
+
+    # Save full path to a text file
+    path_txt_file = os.path.splitext(model_path)[0] + "_path.txt"  # same name, but "_path.txt"
+
+    with open(path_txt_file, "w") as f:
+        f.write(os.path.abspath(model_path))  # write full absolute path
+
     source_files = [
         inspect.getfile(inspect.currentframe()),  # this script
         os.path.join(BASE_DIR, "config.py"),
@@ -199,7 +208,7 @@ def train_model():
 
         if metrics['f1_macro'] > best_f1 and SAVE_MODEL:
             best_f1 = metrics['f1_macro']
-            torch.save(model.state_dict(), f"model_{NICKNAME}.pt")
+            torch.save(model.state_dict(), model_path)
             print("Model saved!")
 
     with open(os.path.join(log_dir, "metrics_log.json"), "w") as f:
@@ -252,7 +261,6 @@ def train_model():
     plt.savefig(os.path.join(log_dir, "feature_maps.png"))
     plt.close()
 
-    torch.save(model.state_dict(), os.path.join(log_dir, f"model_{NICKNAME}.pt"))
 
 if __name__ == '__main__':
     train_model()
