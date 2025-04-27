@@ -92,7 +92,20 @@ class CustomDataset(data.Dataset):
         self.label_map = label_map
         self.transform = transforms.Compose([
             transforms.ToPILImage(),
-            transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
+            transforms.RandomHorizontalFlip(p=0.5),           # Randomly flip horizontally
+            transforms.RandomVerticalFlip(p=0.2),             # Randomly flip vertically (less common)
+            transforms.RandomResizedCrop(
+                size=(IMAGE_SIZE, IMAGE_SIZE),
+                scale=(0.8, 1.0),   # Random zoom between 80% and 100%
+                ratio=(0.9, 1.1)    # Allow a little squishing/stretching
+            ),
+            transforms.ColorJitter(
+                brightness=0.2,
+                contrast=0.2,
+                saturation=0.2,
+                hue=0.02           # Slight color variations
+            ),
+            transforms.RandomRotation(degrees=10),             # Small random rotations
             transforms.ToTensor()
         ])
 
