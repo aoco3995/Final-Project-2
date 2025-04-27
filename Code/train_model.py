@@ -20,7 +20,7 @@ import seaborn as sns
 
 # Main training loop
 def train_model():
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H:%M:%S")
     log_dir = os.path.join(BASE_DIR, "training_logs", f"{NICKNAME}_{timestamp}")
     os.makedirs(log_dir, exist_ok=True)
     script_dir = os.path.join(log_dir, "scripts")
@@ -122,6 +122,7 @@ def train_model():
     metrics_log = []  # Store metrics for each epoch
     total_loss = []
     ind = []
+    f1_scores = []
     for epoch in range(n_epoch):
         model.train()
         running_loss = 0
@@ -151,6 +152,7 @@ def train_model():
                 reals.extend(targets.numpy())
 
         metrics = evaluate_metrics(np.array(reals), np.array(preds))
+        f1_scores.append(metrics['f1_macro'])
         epoch_metrics = {
             "epoch": epoch + 1,
             "loss": running_loss,
@@ -208,8 +210,15 @@ def train_model():
     plt.plot(total_loss)
     plt.title('Training Loss')
     plt.xlabel('Iterations')
-
     plt.savefig(os.path.join(log_dir, "loss_curve.png"))
+    plt.close()
+
+    plt.figure()
+    plt.plot(f1_scores)
+    plt.title('F1 Score')
+    plt.xlabel('Epochs')
+    plt.ylabel('F1 Score')
+    plt.savefig(os.path.join(log_dir, "f1_score.png"))
     plt.close()
 
     # Access the first convolutional layer
