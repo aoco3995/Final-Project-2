@@ -182,18 +182,6 @@ def train_model():
         conf_dir = os.path.join(log_dir, "confusion_matrices")
         os.makedirs(conf_dir, exist_ok=True)
 
-        # Save each class confusion matrix separately
-        for class_idx, cm in enumerate(conf_matrices):
-            plt.figure(figsize=(4, 4))
-            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-                        xticklabels=[f'Not {class_idx}', f'{class_idx}'],
-                        yticklabels=[f'Not {class_idx}', f'{class_idx}'])
-            plt.title(f'Confusion Matrix for Class {class_idx}')
-            plt.xlabel('Predicted')
-            plt.ylabel('True')
-            plt.tight_layout()
-            plt.savefig(os.path.join(conf_dir, f"confusion_matrix_class_{class_idx}_epoch_{epoch + 1}.png"))
-            plt.close()
 
         # Generate classification report
         report = classification_report(np.array(reals), np.array(preds), target_names=list(label_map.keys()),
@@ -210,6 +198,19 @@ def train_model():
             best_f1 = metrics['f1_macro']
             torch.save(model.state_dict(), model_path)
             print("Model saved!")
+
+            # Save each class confusion matrix separately
+            for class_idx, cm in enumerate(conf_matrices):
+                plt.figure(figsize=(4, 4))
+                sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+                            xticklabels=[f'Not {class_idx}', f'{class_idx}'],
+                            yticklabels=[f'Not {class_idx}', f'{class_idx}'])
+                plt.title(f'Confusion Matrix for Class {class_idx}')
+                plt.xlabel('Predicted')
+                plt.ylabel('True')
+                plt.tight_layout()
+                plt.savefig(os.path.join(conf_dir, f"confusion_matrix_class_{class_idx}_epoch_{epoch + 1}.png"))
+                plt.close()
 
     with open(os.path.join(log_dir, "metrics_log.json"), "w") as f:
         json.dump(metrics_log, f, indent=4)
