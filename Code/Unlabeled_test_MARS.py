@@ -15,10 +15,10 @@ NICKNAME = "MARS"
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 LABEL_MAP = {
-    "Crack": 0,
-    "Dent": 1,
-    "Paint_Peel": 2,
-    "Scratch": 3
+    "Scratch": 0,
+    "Paint_Peel": 1,
+    "Rivet Damage": 2,
+    "Rust": 3
 }  # Your label -> index dictionary
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "Dataset", "Aircraft_Fuselage_DET2023", "unlabel_aircraft_fuselage")
