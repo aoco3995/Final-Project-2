@@ -252,5 +252,7 @@ def train_model():
     plt.savefig(os.path.join(log_dir, "feature_maps.png"))
     plt.close()
 
+    torch.save(model.state_dict(), os.path.join(log_dir, f"model_{NICKNAME}.pt"))
+
 if __name__ == '__main__':
     train_model()
