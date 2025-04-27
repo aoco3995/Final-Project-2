@@ -15,6 +15,7 @@ import random
 # Load JSON annotations
 def load_json_annotations(json_folder):
     rows = []
+    
     for fname in os.listdir(json_folder):
         if fname.endswith(".json"):
             with open(os.path.join(json_folder, fname), "r") as f:
@@ -23,8 +24,66 @@ def load_json_annotations(json_folder):
                     image = item["image"]
                     for ann in item["annotations"]:
                         label = ann["label"]
-                        rows.append({"id": image, "target": label, "data": data[0]})
-    return pd.DataFrame(rows)
+        rows.append({"id": image, "target": label, "data": data[0]})  # Corrected: inside the loop
+
+    # Sort rows by "id"
+    rows = sorted(rows, key=lambda x: x['id'])
+
+    # Count current samples per class
+    class_counts = {
+        'rust': 0,
+        'scratch': 0,
+        'rivet_damage': 0,
+        'paint_peel': 0
+    }
+
+    for row in rows:
+        if row['target'] in class_counts:
+            class_counts[row['target']] += 1
+
+    print(f"Current class counts: {class_counts}")
+
+    # Find the maximum class size
+    max_count = max(class_counts.values())
+
+    # Oversample: duplicate rows for underrepresented classes
+    balanced_rows = []
+
+    for target_class in class_counts.keys():
+        # Extract all rows with this target
+        class_rows = [row for row in rows if row['target'] == target_class]
+        
+        # Duplicate as needed
+        if len(class_rows) < max_count:
+            multiplier = max_count // len(class_rows)
+            remainder = max_count % len(class_rows)
+            balanced_class_rows = class_rows * multiplier + random.sample(class_rows, remainder)
+        else:
+            balanced_class_rows = class_rows
+        
+        balanced_rows.extend(balanced_class_rows)
+
+    print(f"Balanced dataset size: {len(balanced_rows)}")
+
+    rows = balanced_rows
+
+    class_counts = {
+        'rust': 0,
+        'scratch': 0,
+        'rivet_damage': 0,
+        'paint_peel': 0
+    }
+
+    for row in rows:
+        if row['target'] in class_counts:
+            class_counts[row['target']] += 1
+
+    print(f"Current class counts: {class_counts}")
+
+    # Shuffle for randomness
+    random.shuffle(balanced_rows)
+
+    return pd.DataFrame(balanced_rows)
 
 # Dataset Class
 class CustomDataset(data.Dataset):
