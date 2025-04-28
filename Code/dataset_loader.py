@@ -122,7 +122,7 @@ class CustomDataset(data.Dataset):
         # Save a copy of the *original* image to pull from
         original_image = image.copy()
 
-        change = random.randint(1, 5)
+        change = 2
 
         black_image = np.zeros_like(image)
 
