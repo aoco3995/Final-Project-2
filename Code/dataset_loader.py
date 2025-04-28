@@ -11,6 +11,7 @@ import random
 import torch
 import math
 import random
+import numpy as np
 
 # Load JSON annotations
 def load_json_annotations(json_folder):
@@ -117,25 +118,47 @@ class CustomDataset(data.Dataset):
         img_path = os.path.join(DATA_DIR, row['id'])
         image = cv2.imread(img_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        change = random.randint(1,5)
+
+        # Save a copy of the *original* image to pull from
+        original_image = image.copy()
+
+        change = random.randint(1, 5)
+
+        black_image = np.zeros_like(image)
+
+        collected_targets = set()
+
         for ann in row['data']['annotations']:
-            if (change == 1):
+            if change > 1:
                 x = int(math.floor(ann['coordinates']['x']))
                 y = int(math.floor(ann['coordinates']['y']))
-                row_target = 'none'
+                current_target = row['target']
             else:
                 x = random.randint(0, image.shape[1])
                 y = random.randint(0, image.shape[0])
-                row_target = row['target']
-                
+                current_target = 'none'
 
             w = int(ann['coordinates']['width'])
             h = int(ann['coordinates']['height'])
-            image[(int(y-h/2)):(int(y+h/2)), (int(x-w/2)):(int(x+w/2)), :] = 0
+
+            y1 = max(int(y - h / 2), 0)
+            y2 = min(int(y + h / 2), image.shape[0])
+            x1 = max(int(x - w / 2), 0)
+            x2 = min(int(x + w / 2), image.shape[1])
+
+            # Important: Always copy from the original unmodified image
+            black_image[y1:y2, x1:x2, :] = original_image[y1:y2, x1:x2, :]
+
+            for label in current_target.split(','):
+                collected_targets.add(label)
+
+        image = black_image
 
         image = self.transform(image)
+
         target = [0] * len(self.label_map)
-        for label in row_target.split(','):
+        for label in collected_targets:
             if label in self.label_map:
                 target[self.label_map[label]] = 1
+
         return image, torch.FloatTensor(target)
