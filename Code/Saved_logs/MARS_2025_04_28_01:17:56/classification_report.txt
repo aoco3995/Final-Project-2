@@ -1,0 +1,11 @@
+              precision    recall  f1-score   support
+
+  paint_peel       0.25      0.10      0.14        20
+rivet_damage       0.40      0.57      0.47         7
+        rust       0.18      0.14      0.16        14
+     scratch       0.64      0.68      0.66        37
+
+   micro avg       0.49      0.42      0.45        78
+   macro avg       0.37      0.37      0.36        78
+weighted avg       0.44      0.42      0.42        78
+ samples avg       0.40      0.42      0.41        78
