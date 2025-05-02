@@ -214,7 +214,7 @@ def manual_grading(df, num_samples=10, save_corrected_csv='corrected_labels.csv'
 if __name__ == '__main__':
     model = CNN(num_classes=NUM_CLASSES, image_size=IMAGE_SIZE)
     tester = ModelTester(model=model,
-                         model_path='/home/ubuntu/Final-Project-2/Code/training_logs/MARS_2025_05_01_02:19:58/model_MARS.pt',
+                         model_path='/home/ubuntu/Final-Project-2/Code/Saved_logs/Final_model/model_MARS.pt',
                          label_map=LABEL_MAP,
                          threshold=THRESHOLD,
                          image_size=IMAGE_SIZE,
