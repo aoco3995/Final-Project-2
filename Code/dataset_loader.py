@@ -13,6 +13,7 @@ import math
 import random
 import numpy as np
 
+
 # Load JSON annotations
 def load_json_annotations(json_folder):
     rows = []
@@ -106,7 +107,7 @@ class CustomDataset(data.Dataset):
                 saturation=0.2,
                 hue=0.02           # Slight color variations
             ),
-            transforms.RandomRotation(degrees=10),             # Small random rotations
+            transforms.RandomRotation(degrees=90),             # Small random rotations
             transforms.ToTensor()
         ])
 
@@ -138,8 +139,8 @@ class CustomDataset(data.Dataset):
                 y = random.randint(0, image.shape[0])
                 current_target = 'none'
 
-            w = int(ann['coordinates']['width'])
-            h = int(ann['coordinates']['height'])
+            w = int(ann['coordinates']['width']) * (1 + random.randint(5, 30) * 0.1)
+            h = int(ann['coordinates']['height']) *  (1 + random.randint(5, 30) * 0.1)
 
             y1 = max(int(y - h / 2), 0)
             y2 = min(int(y + h / 2), image.shape[0])
@@ -161,4 +162,4 @@ class CustomDataset(data.Dataset):
             if label in self.label_map:
                 target[self.label_map[label]] = 1
 
-        return image, torch.FloatTensor(target)
+        return image, torch.FloatTensor(target)#, original_image, row['id']

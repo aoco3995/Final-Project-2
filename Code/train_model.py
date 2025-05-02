@@ -108,7 +108,8 @@ def train_model():
     train_loader = data.DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = data.DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False)
 
-    model = CNN(len(label_map)).to(device)
+    model = CNN(num_classes=len(label_map), image_size=IMAGE_SIZE).to(device)
+
     print(model)
     # Save model architecture to txt
     model_info_path = os.path.join(log_dir, "model_architecture.txt")
@@ -230,36 +231,54 @@ def train_model():
     plt.savefig(os.path.join(log_dir, "f1_score.png"))
     plt.close()
 
-    # Access the first convolutional layer
-    first_conv_layer = model.conv1
+    # Access the three parallel conv layers
+    conv_layers = {
+        "7x7": model.conv1_7x7,
+        "5x5": model.conv1_5x5,
+        "3x3": model.conv1_3x3
+    }
 
-    # Get the weights of the layer
-    weights = first_conv_layer.weight.data.cpu().numpy()
+    # --- Visualize kernels ---
+    for name, conv in conv_layers.items():
+        weights = conv.weight.data.cpu().numpy()  # Shape: (out_channels, in_channels, k, k)
+        num_filters = weights.shape[0]
+        fig, axes = plt.subplots(nrows=num_filters // 4 + 1, ncols=4, figsize=(12, 3 * (num_filters // 4 + 1)))
+        axes = axes.flatten()
 
-    # Visualize the kernels
-    plt.figure()
-    fig, axes = plt.subplots(nrows=8, ncols=4)
-    for i in range(16):
-        ax = axes[i // 4, i % 4]
-        ax.imshow(weights[i, 0], cmap='gray')
-        ax.axis('off')
-    plt.tight_layout()
-    plt.savefig(os.path.join(log_dir, "kernels.png"))
-    plt.close()
+        for i in range(num_filters):
+            axes[i].imshow(weights[i, 0], cmap='gray')  # Show 1st channel of each filter
+            axes[i].axis('off')
+        for i in range(num_filters, len(axes)):
+            axes[i].axis('off')  # Hide unused subplots
 
-    # Get the output of the first convolutional layer
-    first_batch = next(iter(train_loader))
-    image = first_batch[0][0].to(device)
-    output = model.conv1(image).cpu()
+        plt.suptitle(f"Kernels from conv1_{name}")
+        plt.tight_layout()
+        plt.savefig(os.path.join(log_dir, f"kernels_{name}.png"))
+        plt.close()
 
-    # Visualize feature maps
-    plt.figure()
-    for i in range(output.shape[0]):
-        plt.subplot(8, 4, i + 1)  # Adjust grid size as needed
-        plt.imshow(output[i].detach().numpy(), cmap='gray')
-        plt.axis('off')
-    plt.savefig(os.path.join(log_dir, "feature_maps.png"))
-    plt.close()
+    # --- Visualize feature maps on a sample image ---
+    model.eval()
+    with torch.no_grad():
+        first_batch = next(iter(train_loader))
+        image_tensor = first_batch[0][0].unsqueeze(0).to(device)  # Add batch dim
+
+        for name, conv in conv_layers.items():
+            feature_maps = conv(image_tensor).cpu().squeeze(0)  # Shape: (C, H, W)
+
+            num_maps = feature_maps.shape[0]
+            fig, axes = plt.subplots(nrows=num_maps // 4 + 1, ncols=4, figsize=(12, 3 * (num_maps // 4 + 1)))
+            axes = axes.flatten()
+
+            for i in range(num_maps):
+                axes[i].imshow(feature_maps[i], cmap='gray')
+                axes[i].axis('off')
+            for i in range(num_maps, len(axes)):
+                axes[i].axis('off')
+
+            plt.suptitle(f"Feature maps from conv1_{name}")
+            plt.tight_layout()
+            plt.savefig(os.path.join(log_dir, f"feature_maps_{name}.png"))
+            plt.close()
 
 
 if __name__ == '__main__':
