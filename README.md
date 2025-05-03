@@ -44,7 +44,7 @@ Final-Project-X/
 
 ## Overview
 
-This repository contains the materials for Final Project X: Aircraft Fuselage Defect Detection Using CNN, completed for ECEN 5060 Deep Learning, Dr. Hagan. The project focuses on detecting defects in aircraft fuselage images using convolutional neural networks (CNNs). The goal is to automate the identification of structural defects to improve inspection efficiency and safety.
+This repository contains the materials for Final Project: Aircraft Fuselage Defect Detection Using CNN, completed for ECEN 5060 Deep Learning, Dr. Hagan. The project focuses on detecting defects in aircraft fuselage images using convolutional neural networks (CNNs). The goal is to automate the identification of structural defects to improve inspection efficiency and safety.
 
 ## Team Members
 
