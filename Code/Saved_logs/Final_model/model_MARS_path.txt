@@ -1,0 +1,1 @@
+/home/ubuntu/Final-Project-2/Code/Saved_logs/Final_model/model_MARS.pt
