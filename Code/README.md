@@ -1,6 +1,6 @@
 # Code Directory README
 
-This folder contains the core source code for the \[Project Name] project.
+This folder contains the core source code for Final Project Team 2.
 
 ## Structure
 
@@ -74,16 +74,35 @@ Code/
 
 6. Load and preview training data samples:
 
+   First launch an interactive Python session:
+
    ```bash
-   python quick_load.py
+   python
    ```
 
-   This module loads and splits the dataset, applies augmentation, and saves a visualized sample image as `sample_image.png`.
-   To view a specific example, call the `view_image()` function with the desired index:
+   Then run:
 
    ```python
-   view_image(sample_index=0)
+   from quick_load import *
+   view_image(0)  # Replace 0 with any index to view a different sample
    ```
+
+   This will load a sample from the training dataset, apply augmentations and masking, and save a visualization to `sample_image.png`.
+   Running the same index multiple times will result in different augmentations and mask patterns.
+
+   **Note:** In order to use `view_image()` successfully, you must first uncomment the return values for `original_image` and `row['id']` on line 165 of `dataset_loader.py`:
+
+   ```python
+   return image, torch.FloatTensor(target), original_image, row['id']
+   ```
+
+   This line is commented out by default:
+
+   ```python
+   return image, torch.FloatTensor(target)#, original_image, row['id']
+   ```
+
+   Be sure to re-comment the additional return values before training the model again, as the training code expects only two return values from the dataset.
 
    The saved image includes annotations showing which labels are applied.
 
