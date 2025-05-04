@@ -1,4 +1,4 @@
-# Final Project X: Aircraft Fuselage Defect Detection Using CNN
+# Final Project Team 2: Aircraft Fuselage Defect Detection Using CNN
 
 ## Repository Structure
 
