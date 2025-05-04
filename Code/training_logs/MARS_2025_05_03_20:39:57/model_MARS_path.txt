@@ -1,1 +1,0 @@
-/home/ubuntu/Final-Project-2/Code/training_logs/MARS_2025_05_03_20:39:57/model_MARS.pt
