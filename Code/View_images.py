@@ -7,7 +7,7 @@ DATA_DIR = "Dataset/Aircraft_Fuselage_DET2023/unlabel_aircraft_fuselage"
 csv_path = "pseudo_labels_MARS.csv"
 
 # Set the label you're interested in (case-insensitive match)
-TARGET_LABEL = "scratch".lower()
+TARGET_LABEL = "paint peel".lower()
 
 # Load and filter CSV entries
 with open(csv_path, newline='') as f:
