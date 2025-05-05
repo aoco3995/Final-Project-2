@@ -1,9 +1,9 @@
-# Final Project X: Aircraft Fuselage Defect Detection Using CNN
+# Final Project Team 2: Aircraft Fuselage Defect Detection Using CNN
 
 ## Repository Structure
 
 ```
-Final-Project-X/
+Final-Project-2/
 ├── Proposal/
 │   └── Final_Proposal.pdf
 ├── Final-Group-Project-Report/
@@ -44,7 +44,7 @@ Final-Project-X/
 
 ## Overview
 
-This repository contains the materials for Final Project: Aircraft Fuselage Defect Detection Using CNN, completed for ECEN 5060 Deep Learning, Dr. Hagan. The project focuses on detecting defects in aircraft fuselage images using convolutional neural networks (CNNs). The goal is to automate the identification of structural defects to improve inspection efficiency and safety.
+This repository contains the materials for Final Project X: Aircraft Fuselage Defect Detection Using CNN, completed for ECEN 5060 Deep Learning, Dr. Hagan. The project focuses on detecting defects in aircraft fuselage images using convolutional neural networks (CNNs). The goal is to automate the identification of structural defects to improve inspection efficiency and safety.
 
 ## Team Members
 
@@ -116,6 +116,28 @@ The project proposal is located in the `Proposal/` directory as `Final_Proposal.
 ## Final Report
 
 The group's final report is located in the `Final-Group-Project-Report/` directory.
+
+## Dependencies
+
+This project requires the following Python packages. Most of these can be installed via pip:
+
+```bash
+pip install torch torchvision pandas matplotlib seaborn scikit-learn tqdm pillow
+```
+
+**Core Libraries:**
+- `torch`, `torchvision` – Deep learning and dataset utilities
+- `pandas`, `numpy` – Data manipulation
+- `matplotlib`, `seaborn` – Plotting and visualization
+- `scikit-learn` – Evaluation metrics
+- `tqdm` – Progress bars
+- `PIL` – Image handling
+- `opencv-python` (`cv2`) – Image I/O and annotation
+
+**Standard Library Modules Used:**
+- `os`, `json`, `csv`, `random`, `math`, `datetime`, `inspect`, `shutil`, `importlib`
+
+---
 
 ## Final Presentation
 

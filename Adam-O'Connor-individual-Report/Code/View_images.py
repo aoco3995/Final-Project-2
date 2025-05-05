@@ -3,8 +3,8 @@ import csv
 import os
 
 # Path to image directory and CSV file
-DATA_DIR = "Dataset/Aircraft_Fuselage_DET2023/unlabel_aircraft_fuselage"
-csv_path = "pseudo_labels_MARS.csv"
+DATA_DIR = "../../Code/Dataset/Aircraft_Fuselage_DET2023/unlabel_aircraft_fuselage"
+csv_path = "../../Code/pseudo_labels_MARS.csv"
 
 # Set the label you're interested in (case-insensitive match)
 TARGET_LABEL = "paint peel".lower()
