@@ -8,7 +8,7 @@ from model import CNN
 from sklearn.preprocessing import MultiLabelBinarizer
 
 # --- Load Model ---
-model_path = "/home/ubuntu/Final-Project-2/Code/training_logs/MARS_2025_05_01_02:19:58/model_MARS.pt"
+model_path = "../Code/Saved_logs/Final_model/model_MARS.pt"
 model = CNN(num_classes=4, image_size=IMAGE_SIZE).to(device)
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
